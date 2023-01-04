@@ -7,9 +7,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 //export default 와 같음
 module.exports = {
-  entry: "./src/index.jsx",
+  entry: "./src/index.tsx",
   resolve: {
-    extensions: [".js", ".jsx"],
+    extensions: [".js", ".jsx", ".ts", ".tsx"],
   },
   output: {
     path: path.resolve(__dirname, "../build"),
@@ -32,7 +32,7 @@ module.exports = {
       {
         oneOf: [
           {
-            test: /\.(js|jsx)$/,
+            test: /\.(ts|tsx)$/,
             exclude: /node_modules/,
             use: {
               loader: "babel-loader",
