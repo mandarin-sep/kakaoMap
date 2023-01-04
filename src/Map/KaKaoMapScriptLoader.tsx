@@ -9,7 +9,6 @@ interface KaKaoMapScriptLoaderProps {
 
 const KaKaoMapScriptLoader = (props: KaKaoMapScriptLoaderProps) => {
   const [mapScriptLoaded, setMapScriptLoaded] = useState(false);
-  console.log(KAKAO_MAP_APP_KEY);
 
   useEffect(() => {
     const mapScript = document.getElementById(KAKAO_MAP_SCRIPT_ID);
