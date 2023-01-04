@@ -1,9 +1,13 @@
 const path = require("path"); // import path from "path"와 동일
 
 const isProduction = process.env.NODE_ENV === "production";
-
+const dotenv = require("dotenv");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+
+//process.env.~~ 로 접근 가능하게 해줌
+dotenv.config();
 
 //export default 와 같음
 module.exports = {
@@ -66,5 +70,8 @@ module.exports = {
           filename: "[name].[contenthash:8].css",
         })
       : undefined,
+    new webpack.DefinePlugin({
+      "process.env": JSON.stringify(process.env),
+    }),
   ].filter(Boolean),
 };

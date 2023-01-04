@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 
 const KAKAO_MAP_SCRIPT_ID = "kakao-map-script";
-const KAKAO_MAP_APP_KEY = "6e8744fb8202ee4b83edb1a749ed0c3f";
+const KAKAO_MAP_APP_KEY = process.env.KAKAO_MAP_KEY;
 
 interface KaKaoMapScriptLoaderProps {
   children: ReactNode;
@@ -9,6 +9,7 @@ interface KaKaoMapScriptLoaderProps {
 
 const KaKaoMapScriptLoader = (props: KaKaoMapScriptLoaderProps) => {
   const [mapScriptLoaded, setMapScriptLoaded] = useState(false);
+  console.log(KAKAO_MAP_APP_KEY);
 
   useEffect(() => {
     const mapScript = document.getElementById(KAKAO_MAP_SCRIPT_ID);
