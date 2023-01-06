@@ -1,7 +1,13 @@
-import { CSSProperties, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import styled from "@emotion/styled";
+import { KakaoMapContext } from "../hooks/useMap";
 
-const DynamicMap = () => {
+interface DynamicMapProps {
+  children: ReactNode;
+}
+
+const DynamicMap = (props: DynamicMapProps) => {
+  const [map, setMap] = useState<kakao.maps.Map>();
   const KaKaoMapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -10,15 +16,26 @@ const DynamicMap = () => {
     }
 
     //지도를 생성하는 코드
-    new window.kakao.maps.Map(KaKaoMapRef.current, {
-      center: new kakao.maps.LatLng(33.450701, 126.570667),
-      level: 3,
-    });
+    setMap(
+      new kakao.maps.Map(KaKaoMapRef.current, {
+        center: new kakao.maps.LatLng(33.450701, 126.570667),
+        level: 3,
+      })
+    );
   }, []);
   return (
-    <Container>
-      <Map ref={KaKaoMapRef} />
-    </Container>
+    <>
+      <Container>
+        <Map ref={KaKaoMapRef} />
+      </Container>
+      {map ? (
+        <KakaoMapContext.Provider value={map}>
+          {props.children}
+        </KakaoMapContext.Provider>
+      ) : (
+        <div>지도 정보를 가져오는데 실패했습니다.</div>
+      )}
+    </>
   );
 };
 

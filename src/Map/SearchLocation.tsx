@@ -1,11 +1,71 @@
 import styled from "@emotion/styled";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
+import { useMap } from "../hooks/useMap";
+import { PlaceType } from "./mapTypes";
 
-const SearchLocation = () => {
+interface SearchLocationprops {
+  onUpdatePlaces: (places: PlaceType[]) => void;
+}
+
+const SearchLocation = (props: SearchLocationprops) => {
+  const map = useMap();
   const [keyword, setKeyword] = useState("");
+  const [placeList, setPlaceList] = useState<PlaceType[]>([]);
+  const placeService = useRef<kakao.maps.services.Places | null>(null);
+
+  const searchPlaces = (keyword: string) => {
+    if (!keyword.replace(/^\s+|\s$/g, "")) {
+      alert("키워드를 입력하세요!");
+      return;
+    }
+
+    if (!placeService.current) {
+      alert("placeService 에러");
+      return;
+    }
+
+    placeService.current.keywordSearch(keyword, (data, status) => {
+      const { kakao } = window;
+
+      if (status === kakao.maps.services.Status.OK) {
+        const placesInfos = data.map((info) => {
+          return {
+            id: info.id,
+            position: new kakao.maps.LatLng(Number(info.y), Number(info.x)),
+            title: info.place_name,
+            address: info.address_name,
+          };
+        });
+        props.onUpdatePlaces(placesInfos);
+        setPlaceList(placesInfos);
+      } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+        alert("검색 결과 없음");
+        return;
+      } else if (status === kakao.maps.services.Status.ERROR) {
+        alert("오류가 발생");
+        return;
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (placeService.current) {
+      return;
+    }
+
+    placeService.current = new kakao.maps.services.Places();
+  }, []);
+
   const handlesubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    searchPlaces(keyword);
   };
+
+  const handleItemClick = (place: PlaceType) => {
+    map.setCenter(place.position);
+    map.setLevel(4);
+  };
+
   return (
     <Container>
       <Form onSubmit={handlesubmit}>
@@ -17,14 +77,12 @@ const SearchLocation = () => {
         />
       </Form>
       <List>
-        {Array.from({ length: 70 }).map((item, index) => {
-          return (
-            <Item key={index}>
-              <label>지역</label>
-              <span>수원 권선구 곡반정동 577-4</span>
-            </Item>
-          );
-        })}
+        {placeList.map((item, index) => (
+          <Item key={item.id} onClick={() => handleItemClick(item)}>
+            <label>{`${index + 1}. ${item.title}`}</label>
+            <span>{item.address}</span>
+          </Item>
+        ))}
       </List>
     </Container>
   );
